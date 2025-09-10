@@ -7,30 +7,43 @@ interface PlayerHandProps {
   cards: CardType[];
   isCurrentPlayer: boolean;
   playerName: string;
+  position?: 'top' | 'bottom';
+  cardsFaceUp?: boolean;
 }
 
-export function PlayerHand({ cards, isCurrentPlayer, playerName }: PlayerHandProps) {
-  const handContainerStyle = isCurrentPlayer
-    ? [styles.container, styles.activePlayer]
-    : styles.container;
+export function PlayerHand({
+  cards,
+  isCurrentPlayer,
+  playerName,
+  position = 'bottom',
+  cardsFaceUp = true,
+}: PlayerHandProps) {
+  const handContainerStyle = [
+    styles.container,
+    position === 'top' ? styles.topHand : styles.bottomHand,
+    isCurrentPlayer ? styles.activePlayer : styles.inactivePlayer,
+  ];
 
   const middleIndex = (cards.length - 1) / 2;
 
   return (
     <View style={handContainerStyle}>
+      {position === 'top' && isCurrentPlayer && <View style={styles.turnIndicator} />}
       <View style={styles.cardsContainer}>
         {cards.map((card, index) => {
           // Computer card game style fanning - even spacing, gentle curve
           const totalCards = cards.length;
           const maxRotation = 20; // Total fan angle in degrees (gentle spread)
           const rotationStep = totalCards > 1 ? maxRotation / (totalCards - 1) : 0;
-          const rotation = -maxRotation / 2 + (rotationStep * index); // Center the fan
+          const rotationMultiplier = position === 'top' ? -1 : 1;
+          const rotation = (-maxRotation / 2 + rotationStep * index) * rotationMultiplier; // Center the fan
 
           // Even spacing with gentle curve
           const baseSpacing = -15; // Base spacing between cards
           const translateX = (index - middleIndex) * baseSpacing;
+          const translationMultiplier = position === 'top' ? 1 : -1;
           const curveOffset = Math.sin((index / (totalCards - 1 || 1)) * Math.PI) * 5; // Gentle curve
-          const translateY = -Math.abs(curveOffset); // Cards follow curve downward
+          const translateY = translationMultiplier * Math.abs(curveOffset); // Cards follow curve
 
           return (
             <View
@@ -47,12 +60,12 @@ export function PlayerHand({ cards, isCurrentPlayer, playerName }: PlayerHandPro
                 },
               ]}
             >
-              <Card {...card} />
+              <Card {...card} faceUp={cardsFaceUp} />
             </View>
           );
         })}
       </View>
-      {isCurrentPlayer && <View style={styles.turnIndicator} />}
+      {position === 'bottom' && isCurrentPlayer && <View style={styles.turnIndicator} />}
     </View>
   );
 }
@@ -60,11 +73,18 @@ export function PlayerHand({ cards, isCurrentPlayer, playerName }: PlayerHandPro
 const styles = StyleSheet.create({
   container: {
     position: 'fixed',
-    bottom: 20,
     left: 0,
     right: 0,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  bottomHand: {
+    bottom: 20,
+  },
+  topHand: {
+    top: 20,
+  },
+  inactivePlayer: {
     opacity: 0.8,
     transform: [{ scale: 0.95 }],
   },
@@ -86,6 +106,6 @@ const styles = StyleSheet.create({
     width: '40%',
     backgroundColor: '#ffc107', // A gold/yellow color for highlight
     borderRadius: 2,
-    marginTop: 8,
+    marginVertical: 8,
   },
 });

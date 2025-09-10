@@ -19,9 +19,31 @@ export default function CpuGameScreen() {
     { id: '10', suit: '♥', rank: '4', value: 4 },
   ];
 
+  // Sample cards for the opponent hand
+  const opponentCards: Card[] = [
+    { id: '11', suit: '♠', rank: '3', value: 3 },
+    { id: '12', suit: '♥', rank: 'J', value: 11 },
+    { id: '13', suit: '♦', rank: '8', value: 8 },
+    { id: '14', suit: '♣', rank: 'A', value: 1 },
+    { id: '15', suit: '♠', rank: '6', value: 6 },
+    { id: '16', suit: '♥', rank: 'K', value: 13 },
+    { id: '17', suit: '♦', rank: '4', value: 4 },
+    { id: '18', suit: '♣', rank: '9', value: 9 },
+    { id: '19', suit: '♠', rank: '2', value: 2 },
+    { id: '20', suit: '♥', rank: '10', value: 10 },
+  ];
+
   return (
     <View style={styles.container}>
       <GameBoard>
+        {/* Opponent Hand - Top */}
+        <PlayerHand
+          cards={opponentCards}
+          playerName="CPU"
+          isCurrentPlayer={false}
+          position="top"
+          cardsFaceUp={false}
+        />
         {/* Player Hand - Bottom */}
         <PlayerHand
           cards={playerCards}
